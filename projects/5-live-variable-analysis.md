@@ -17,4 +17,4 @@ Implement tests in the **LiveVariableTests** class. (You may add additional clas
 * 15 points for 100% mutation coverage on **LiveVariableAnalysis** by **LiveVariableTests**
 * 15 points for documentation of **LiveVariableAnalysis**
 * 15 points for documentation of **LiveVariableTests**
-* 10 points for code style (passing SonarLint and legibility)
+* 10 points for code style ( SonarLint and legibility)passing
