@@ -27,8 +27,8 @@ public abstract class CFG {
     /**
      * These three overloads are included to suggest helpers that can be useful.
      * 
-     * @param from
-     * @param to
+     * @param from ASTNode
+     * @param to ASTNode
      */
     public abstract void addEdge(final ASTNode from, final ASTNode to);
     public abstract void addEdge(final ASTNode from, final Node to);
