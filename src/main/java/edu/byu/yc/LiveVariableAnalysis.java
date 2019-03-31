@@ -3,14 +3,22 @@ package edu.byu.yc;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ *
+ * TODO Delete this
+ * Things to remember the CFG is for a method!! Variable names are used without qualifiers, this
+ * means that there is no int or type given for the names
+ *
+ *
+ *
+ */
 public abstract class LiveVariableAnalysis {
 
     private CFG cfg;
-    private Map<Node, Set<String>> entryNodeToVariableNames;
+
 
     public LiveVariableAnalysis(CFG cfg) {
         this.cfg = cfg;
-        this.entryNodeToVariableNames = analyze();
     }
 
     /**
@@ -25,8 +33,6 @@ public abstract class LiveVariableAnalysis {
         return cfg;
     }
 
-    public Map<Node, Set<String>> getEntryNodeToVariableNames() {
-        return entryNodeToVariableNames;
-    }
+
 
 }
