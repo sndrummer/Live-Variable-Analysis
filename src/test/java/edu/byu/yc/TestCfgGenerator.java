@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * TestCfgGenerator creates
+ * TestCfgGenerator generates nodes for a CFG that will be mocked
  */
 public class TestCfgGenerator {
 
@@ -100,6 +100,7 @@ public class TestCfgGenerator {
 
     /**
      * This method generates the nodes to create a more complex CFG based off the following program:
+     * Look at the png with the graph for visual reference
      * <p>
      * ```public static void dnfsort(int[] arr) {
      * int a = 0;              //1
