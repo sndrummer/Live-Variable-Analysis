@@ -52,7 +52,7 @@
 				<version>${pit.version}</version>
 				<configuration>
 					<targetClasses>
-						<param>edu.byu.yc.LiveVariableAnalysis</param>
+						<param>edu.byu.yc.LiveVariableAnalyzer</param>
 					</targetClasses>
 					<targetTests>
 						<param>edu.byu.yc.LiveVariableTests</param>

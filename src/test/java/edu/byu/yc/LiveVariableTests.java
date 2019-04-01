@@ -103,7 +103,7 @@ public class LiveVariableTests {
 
     /**
      * This test mimics a more complex CFG and sees that the LiveVariableAnalyzer works as
-     * expected
+     * expected: refer to graph "CFG dnfsort.png" in project
      */
     @Test
     public void complexCFGTest() {
@@ -224,6 +224,8 @@ public class LiveVariableTests {
 
         LiveVariableAnalysis lva = new LiveVariableAnalyzer(cfg);
         Map<Node, Set<String>> result = lva.analyze();
+
+
 
         logger.info("Analyzer results: {}", result);
 
