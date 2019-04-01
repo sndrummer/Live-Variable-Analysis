@@ -3,17 +3,42 @@ package edu.byu.yc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
+/**
+ * Implementation of the LiveVariableAnalysis that traverses through the CFG to determine the live
+ * nodes at each stage
+ */
 public class LiveVariableAnalyzer extends LiveVariableAnalysis {
 
     private static Logger logger = LoggerFactory.getLogger(LiveVariableAnalysis.class);
     private CFG cfg;
-    private Map<Node, Set<String>> nodeToLiveVariables = new HashMap<>();
+
+    /**
+     * Comparator for nodes that uses their toString names to order in reverse order, just for testing
+     * convenience
+     */
+    private Comparator<Node> nodeComparator = (node1, node2) -> {
+        if (node1.toString().contains("Entry")) {
+            return node2.toString().compareTo(node1.toString());
+        }
+        String str1 = node1.toString();
+        String[] arr1 = str1.split("node");
+        Integer node1Num = Integer.parseInt(arr1[1]);
+
+        String str2 = node2.toString();
+        String[] arr2 = str2.split("node");
+        Integer node2Num = Integer.parseInt(arr2[1]);
+
+        return node2Num.compareTo(node1Num);
+    };
+    private Map<Node, Set<String>> nodeToLiveVariables = new TreeMap<>(nodeComparator);
 
     private Map<Node, Integer> nodeToSuccessorsCovered = new HashMap<>();
     private Set<Node> nodesVisited = new HashSet<>();
@@ -23,6 +48,12 @@ public class LiveVariableAnalyzer extends LiveVariableAnalysis {
         this.cfg = cfg;
     }
 
+    /**
+     * Analyze the live nodes of the CFG by using recursion and going backwards through the graph
+     * to determine what variables are live
+     *
+     * @return the node to live variables map that show what variables were live at a specific node
+     */
     @Override
     public Map<Node, Set<String>> analyze() {
         //Start from the end of the CFG
@@ -39,8 +70,8 @@ public class LiveVariableAnalyzer extends LiveVariableAnalysis {
      * @param liveVariables Set of the live variables from the successor node
      */
     private void traverseCFGLiveNodes(Node node, Set<String> liveVariables) {
-        logger.debug("NOW VISITING NODE {}", node);
         Set<Node> predecessors = getPredecessors(node);
+        if (predecessors == null) return;
 
         if (node != null) {
             for (Node predecessor : predecessors) {
@@ -107,14 +138,23 @@ public class LiveVariableAnalyzer extends LiveVariableAnalysis {
             liveVariablesOfNode.addAll(nodeToLiveVariables.get(node));
         }
         nodeToLiveVariables.put(node, liveVariablesOfNode);
-        logger.info("Putting Node: {} --> {}", node, nodeToLiveVariables.get(node));
     }
 
 
+    /**
+     * Get all the predecessors of a node
+     * @param node Node
+     * @return list of predecessors
+     */
     private Set<Node> getPredecessors(Node node) {
         return cfg.predecessors(node);
     }
 
+    /**
+     * This checks to see if a node has already been visited
+     * @param node Node
+     * @return boolean, true if it has been visited
+     */
     private boolean nodeVisited(Node node) {
         return nodesVisited.contains(node);
     }

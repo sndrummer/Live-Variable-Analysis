@@ -3,7 +3,6 @@ package edu.byu.yc;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +14,9 @@ import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Uses Mockito to test CFG live variable analysis
+ */
 public class LiveVariableTests {
 
     private static Logger logger = LoggerFactory.getLogger(LiveVariableTests.class);
@@ -44,7 +46,7 @@ public class LiveVariableTests {
     @Test
     public void simpleCFGTest() {
         CFG cfg = Mockito.mock(CFG.class);
-        Node entry = EntryNode.getInstance();
+        Node entry = new EntryNode();
         Node exit = ExitNode.getInstance();
         List<Node> simpleCFGNodes = TestCfgGenerator.generateNodesForSimpleCFG();
         //Get the nodes of the CFG
@@ -102,36 +104,177 @@ public class LiveVariableTests {
     }
 
     /**
-     * This test mimics a more complex CFG and sees that the LiveVariableAnalyzer works as
-     * expected: refer to graph "CFG dnfsort.png" in project
+     * Tests a more complex CFG that has been mocked to see that the LiveVariableAnalyzer works as
+     * expected: refer to graph "CFG dnfsort.png" in project to see which a visualization of the CFG
      */
     @Test
     public void complexCFGTest() {
+        CFG cfg = setUpComplexCfgMock();
+
+        Node node1 = cfg.getNodes().get(0);
+        Node node2 = cfg.getNodes().get(1);
+        Node node3 = cfg.getNodes().get(2);
+        Node node4 = cfg.getNodes().get(3);
+        Node node5 = cfg.getNodes().get(4);
+        Node node6 = cfg.getNodes().get(5);
+        Node node7 = cfg.getNodes().get(6);
+        Node node8 = cfg.getNodes().get(7);
+        Node node9 = cfg.getNodes().get(8);
+        Node node10 = cfg.getNodes().get(9);
+        Node node11 = cfg.getNodes().get(10);
+        Node node12 = cfg.getNodes().get(11);
+        Node node13 = cfg.getNodes().get(12);
+        Node node14 = cfg.getNodes().get(13);
+        Node node15 = cfg.getNodes().get(14);
+        Node node16 = cfg.getNodes().get(15);
+
+        LiveVariableAnalysis lva = new LiveVariableAnalyzer(cfg);
+        Map<Node, Set<String>> result = lva.analyze();
+
+        logger.info("Analyzer results: {}", result);
+
+        //Expects 17 nodes since there are 16 nodes + 1 Entry node, do not count exit node
+        assertEquals(17, result.keySet().size());
+
+
+        //Test Node 16 has correct Live Nodes
+        Set<String> expectedNode16Set = new HashSet<>();
+        assertEquals(expectedNode16Set, result.get(node16));
+        
+        //Test Node 15 has correct Live Nodes
+        Set<String> expectedNode15Set = new HashSet<>();
+        expectedNode15Set.add("arr");
+        expectedNode15Set.add("c");
+        assertEquals(expectedNode15Set, result.get(node15));
+
+        //Test Node 14 has correct Live Nodes
+        Set<String> expectedNode14Set = new HashSet<>();
+        expectedNode14Set.add("arr");
+        expectedNode14Set.add("c");
+        assertEquals(expectedNode14Set, result.get(node14));
+        
+        //Test Node 13 has correct Live Nodes
+        Set<String> expectedNode13Set = new HashSet<>();
+        expectedNode13Set.add("b");
+        assertEquals(expectedNode13Set, result.get(node13));
+
+        //Test Node 12 has correct Live Nodes
+        Set<String> expectedNode12Set = new HashSet<>();
+        expectedNode12Set.add("arr");
+        expectedNode12Set.add("c");
+        assertEquals(expectedNode12Set, result.get(node12));
+
+
+        //Test Node 11 has correct Live Nodes
+        Set<String> expectedNode11Set = new HashSet<>();
+        expectedNode11Set.add("arr");
+        expectedNode11Set.add("b");
+        expectedNode11Set.add("c");
+        assertEquals(expectedNode11Set, result.get(node11));
+
+
+        //Test Node 10 has correct Live Nodes
+        Set<String> expectedNode10Set = new HashSet<>();
+        expectedNode10Set.add("arr");
+        expectedNode10Set.add("b");
+        expectedNode10Set.add("c");
+        assertEquals(expectedNode10Set, result.get(node10));
+
+        //Test Node 9 has correct Live Nodes
+        Set<String> expectedNode9Set = new HashSet<>();
+        expectedNode9Set.add("b");
+        assertEquals(expectedNode9Set, result.get(node9));
+
+        //Test Node 8 has correct Live Nodes
+        Set<String> expectedNode8Set = new HashSet<>();
+        expectedNode8Set.add("a");
+        expectedNode8Set.add("b");
+        assertEquals(expectedNode8Set, result.get(node8));
+
+        //Test Node 7 has correct Live Nodes
+        Set<String> expectedNode7Set = new HashSet<>();
+        expectedNode7Set.add("a");
+        expectedNode7Set.add("b");
+        assertEquals(expectedNode7Set, result.get(node7));
+
+        //Test Node 6 has correct Live Nodes
+        Set<String> expectedNode6Set = new HashSet<>();
+        expectedNode6Set.add("arr");
+        expectedNode6Set.add("a");
+        expectedNode6Set.add("b");
+        assertEquals(expectedNode6Set, result.get(node6));
+
+        //Test Node 5 has correct Live Nodes
+        Set<String> expectedNode5Set = new HashSet<>();
+        expectedNode5Set.add("arr");
+        expectedNode5Set.add("a");
+        expectedNode5Set.add("b");
+        expectedNode5Set.add("c");
+        assertEquals(expectedNode5Set, result.get(node5));
+
+
+        //Test Node 4 has correct Live Nodes
+        Set<String> expectedNode4Set = new HashSet<>();
+        expectedNode4Set.add("arr");
+        expectedNode4Set.add("a");
+        expectedNode4Set.add("b");
+        expectedNode4Set.add("c");
+        assertEquals(expectedNode4Set, result.get(node4));
+
+        //Test Node 3 has correct Live Nodes
+        Set<String> expectedNode3Set = new HashSet<>();
+        expectedNode3Set.add("arr");
+        expectedNode3Set.add("a");
+        expectedNode3Set.add("b");
+        assertEquals(expectedNode3Set, result.get(node3));
+
+        //Test Node 2 has correct Live Nodes
+        Set<String> expectedNode2Set = new HashSet<>();
+        expectedNode2Set.add("arr");
+        expectedNode2Set.add("a");
+        assertEquals(expectedNode2Set, result.get(node2));
+
+        //Test Node 1 has correct Live Nodes
+        Set<String> expectedNode1Set = new HashSet<>();
+        expectedNode1Set.add("arr");
+        assertEquals(expectedNode1Set, result.get(node1));
+
+        //Test Entry Node 1 has correct Live Nodes
+        Set<String> expectedEntryNodeSet = new HashSet<>();
+        expectedEntryNodeSet.add("arr");
+        assertEquals(expectedEntryNodeSet, result.get(cfg.entryNode()));
+        
+        
+    }
+
+    private CFG setUpComplexCfgMock() {
         CFG cfg = Mockito.mock(CFG.class);
-        Node entry = EntryNode.getInstance();
+        Node entry = new EntryNode();
         Node exit = ExitNode.getInstance();
-        List<Node> complexCFG = TestCfgGenerator.generateNodesForComplexCFG();
+        List<Node> cfgNodes = TestCfgGenerator.generateNodesForComplexCFG();
         //Get the nodes of the CFG, There are 16
-        Node node1 = complexCFG.get(0);
-        Node node2 = complexCFG.get(1);
-        Node node3 = complexCFG.get(2);
-        Node node4 = complexCFG.get(3);
-        Node node5 = complexCFG.get(4);
-        Node node6 = complexCFG.get(5);
-        Node node7 = complexCFG.get(6);
-        Node node8 = complexCFG.get(7);
-        Node node9 = complexCFG.get(8);
-        Node node10 = complexCFG.get(9);
-        Node node11 = complexCFG.get(10);
-        Node node12 = complexCFG.get(11);
-        Node node13 = complexCFG.get(12);
-        Node node14 = complexCFG.get(13);
-        Node node15 = complexCFG.get(14);
-        Node node16 = complexCFG.get(15);
+        Node node1 = cfgNodes.get(0);
+        Node node2 = cfgNodes.get(1);
+        Node node3 = cfgNodes.get(2);
+        Node node4 = cfgNodes.get(3);
+        Node node5 = cfgNodes.get(4);
+        Node node6 = cfgNodes.get(5);
+        Node node7 = cfgNodes.get(6);
+        Node node8 = cfgNodes.get(7);
+        Node node9 = cfgNodes.get(8);
+        Node node10 = cfgNodes.get(9);
+        Node node11 = cfgNodes.get(10);
+        Node node12 = cfgNodes.get(11);
+        Node node13 = cfgNodes.get(12);
+        Node node14 = cfgNodes.get(13);
+        Node node15 = cfgNodes.get(14);
+        Node node16 = cfgNodes.get(15);
+
+        Mockito.when(cfg.getNodes()).thenReturn(cfgNodes);
 
 
         //Entry Node
-        Mockito.when(cfg.predecessors(exit)).thenReturn(null);
+        Mockito.when(cfg.predecessors(entry)).thenReturn(null);
         Mockito.when(cfg.successors(entry)).thenReturn(getSingleNodeAsSet(node1));
 
         //Node1
@@ -212,6 +355,7 @@ public class LiveVariableTests {
 
         //Exit Node
         Mockito.when(cfg.exitNode()).thenReturn(exit);
+        Mockito.when(cfg.entryNode()).thenReturn(entry);
         Mockito.when(cfg.successors(exit)).thenReturn(null);
 
         nodes = new HashSet<>();
@@ -222,13 +366,7 @@ public class LiveVariableTests {
 
         Mockito.when(cfg.predecessors(exit)).thenReturn(nodes);
 
-        LiveVariableAnalysis lva = new LiveVariableAnalyzer(cfg);
-        Map<Node, Set<String>> result = lva.analyze();
-
-
-
-        logger.info("Analyzer results: {}", result);
-
+        return cfg;
     }
 
     private Set<Node> getSingleNodeAsSet(Node node) {
@@ -236,6 +374,5 @@ public class LiveVariableTests {
         nodes.add(node);
         return nodes;
     }
-
 
 }

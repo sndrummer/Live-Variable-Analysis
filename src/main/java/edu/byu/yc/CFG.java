@@ -46,4 +46,6 @@ public abstract class CFG {
 
     public abstract String buildOverOrderedKeys(Function<List<Node>, String> object);
 
+    public abstract List<Node> getNodes();
+
 }

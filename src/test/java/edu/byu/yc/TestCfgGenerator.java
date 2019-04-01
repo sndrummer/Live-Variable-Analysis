@@ -5,7 +5,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * TestCfgGenerator creates
+ */
 public class TestCfgGenerator {
+
+    private TestCfgGenerator() {
+    }
 
 
     /**
