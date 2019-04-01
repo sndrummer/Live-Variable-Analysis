@@ -161,37 +161,71 @@ public class LiveVariableTests {
         nodes.add(node10);
         Mockito.when(cfg.successors(node5)).thenReturn(nodes);
 
+        //Node6
+        Mockito.when(cfg.predecessors(node6)).thenReturn(getSingleNodeAsSet(node5));
+        Mockito.when(cfg.successors(node6)).thenReturn(getSingleNodeAsSet(node10));
+
+
+        //Node7
+        Mockito.when(cfg.predecessors(node7)).thenReturn(getSingleNodeAsSet(node6));
+        Mockito.when(cfg.successors(node7)).thenReturn(getSingleNodeAsSet(node8));
+
+
+        //Node8
+        Mockito.when(cfg.predecessors(node8)).thenReturn(getSingleNodeAsSet(node7));
+        Mockito.when(cfg.successors(node8)).thenReturn(getSingleNodeAsSet(node9));
+
+        //Node9
+        Mockito.when(cfg.predecessors(node9)).thenReturn(getSingleNodeAsSet(node8));
+        Mockito.when(cfg.successors(node9)).thenReturn(getSingleNodeAsSet(exit));
+
+        //Node10
+        Mockito.when(cfg.predecessors(node10)).thenReturn(getSingleNodeAsSet(node9));
+        Mockito.when(cfg.successors(node10)).thenReturn(getSingleNodeAsSet(node11));
+
+        //Node11
+        Mockito.when(cfg.predecessors(node11)).thenReturn(getSingleNodeAsSet(node10));
+        nodes = new HashSet<>();
+        nodes.add(node12);
+        nodes.add(node13);
+        Mockito.when(cfg.successors(node11)).thenReturn(nodes);
+
+        //Node12
+        Mockito.when(cfg.predecessors(node12)).thenReturn(getSingleNodeAsSet(node11));
+        Mockito.when(cfg.successors(node12)).thenReturn(getSingleNodeAsSet(node14));
+
+        //Node13
+        Mockito.when(cfg.predecessors(node13)).thenReturn(getSingleNodeAsSet(node11));
+        Mockito.when(cfg.successors(node13)).thenReturn(getSingleNodeAsSet(exit));
+
+        //Node14
+        Mockito.when(cfg.predecessors(node14)).thenReturn(getSingleNodeAsSet(node12));
+        Mockito.when(cfg.successors(node14)).thenReturn(getSingleNodeAsSet(node15));
+
+        //Node15
+        Mockito.when(cfg.predecessors(node15)).thenReturn(getSingleNodeAsSet(node14));
+        Mockito.when(cfg.successors(node15)).thenReturn(getSingleNodeAsSet(node16));
+
+        //Node16
+        Mockito.when(cfg.predecessors(node16)).thenReturn(getSingleNodeAsSet(node15));
+        Mockito.when(cfg.successors(node16)).thenReturn(getSingleNodeAsSet(exit));
 
         //Exit Node
         Mockito.when(cfg.exitNode()).thenReturn(exit);
         Mockito.when(cfg.successors(exit)).thenReturn(null);
-        Mockito.when(cfg.predecessors(exit)).thenReturn(getSingleNodeAsSet(node3));
+
+        nodes = new HashSet<>();
+        nodes.add(node16);
+        nodes.add(node13);
+        nodes.add(node9);
+        nodes.add(node4);
+
+        Mockito.when(cfg.predecessors(exit)).thenReturn(nodes);
 
         LiveVariableAnalysis lva = new LiveVariableAnalyzer(cfg);
         Map<Node, Set<String>> result = lva.analyze();
 
         logger.info("Analyzer results: {}", result);
-
-        //Expects 4 nodes since there are 3 nodes + 1 Entry node, do not count exit node
-        assertEquals(4, result.keySet().size());
-
-
-        //Test Node 3 has correct Live Nodes
-        Set<String> expectedNode3Set = new HashSet<>();
-        expectedNode3Set.add("b");
-        expectedNode3Set.add("c");
-        assertEquals(expectedNode3Set, result.get(node3));
-
-        //Test Node 2 has correct Live Nodes
-        Set<String> expectedNode2Set = new HashSet<>();
-        expectedNode2Set.add("b");
-        assertEquals(expectedNode2Set, result.get(node2));
-
-        //Test Node 1 has correct Live Nodes
-        assertEquals(new HashSet<String>(), result.get(node1));
-
-        //Test Entry Node has correct Live Nodes
-        assertEquals(new HashSet<String>(), result.get(entry));
 
     }
 

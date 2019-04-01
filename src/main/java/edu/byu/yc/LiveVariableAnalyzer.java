@@ -51,20 +51,6 @@ public class LiveVariableAnalyzer extends LiveVariableAnalysis {
                 addUses(predecessor, predecessor.getUses(), liveVariables);
             }
 
-            //Here's what you need to do
-            /*
-            1. You need to do what you are doing so far but then
-            2. Check if the prev node has multiple successors, if it does just increment a value
-            3. You could maybe make a Node to successor's covered map? that would be weird but it might work
-            So the key would be the node and the value would be how many successors have been covered,
-            Use node 4 from the HW as an example.
-            4. Make a condition that you ONLY traverse a node with multiple predecessors once you have seen them all!!
-            5. So make something like if successors equals amtSeen then prevNode = curNode, you actually
-            probably don't want recursive in this case because you want it to be iterative!!!! That is true huh
-            6. So make that condition
-             */
-
-
             nodesVisited.add(node);
             for (Node predecessor : predecessors) {
                 if (!nodeVisited(predecessor)) {
