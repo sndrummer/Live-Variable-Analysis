@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 public class LiveVariableTests {
 
     private static Logger logger = LoggerFactory.getLogger(LiveVariableTests.class);
-
     /**
      * This test is included to give you a starting point. You will need
      * additional tests in order to create mutation coverage.
@@ -47,7 +46,7 @@ public class LiveVariableTests {
         CFG cfg = Mockito.mock(CFG.class);
         Node entry = EntryNode.getInstance();
         Node exit = ExitNode.getInstance();
-        List<Node> simpleCFGNodes = generateNodesForSimpleCFG();
+        List<Node> simpleCFGNodes = TestCfgGenerator.generateNodesForSimpleCFG();
         //Get the nodes of the CFG
         Node node1 = simpleCFGNodes.get(0);
         Node node2 = simpleCFGNodes.get(1);
@@ -111,11 +110,25 @@ public class LiveVariableTests {
         CFG cfg = Mockito.mock(CFG.class);
         Node entry = EntryNode.getInstance();
         Node exit = ExitNode.getInstance();
-        List<Node> simpleCFGNodes = generateNodesForSimpleCFG();
-        //Get the nodes of the CFG
-        Node node1 = simpleCFGNodes.get(0);
-        Node node2 = simpleCFGNodes.get(1);
-        Node node3 = simpleCFGNodes.get(2);
+        List<Node> complexCFG = TestCfgGenerator.generateNodesForComplexCFG();
+        //Get the nodes of the CFG, There are 16
+        Node node1 = complexCFG.get(0);
+        Node node2 = complexCFG.get(1);
+        Node node3 = complexCFG.get(2);
+        Node node4 = complexCFG.get(3);
+        Node node5 = complexCFG.get(4);
+        Node node6 = complexCFG.get(5);
+        Node node7 = complexCFG.get(6);
+        Node node8 = complexCFG.get(7);
+        Node node9 = complexCFG.get(8);
+        Node node10 = complexCFG.get(9);
+        Node node11 = complexCFG.get(10);
+        Node node12 = complexCFG.get(11);
+        Node node13 = complexCFG.get(12);
+        Node node14 = complexCFG.get(13);
+        Node node15 = complexCFG.get(14);
+        Node node16 = complexCFG.get(15);
+
 
         //Entry Node
         Mockito.when(cfg.predecessors(exit)).thenReturn(null);
@@ -131,7 +144,23 @@ public class LiveVariableTests {
 
         //Node3
         Mockito.when(cfg.predecessors(node3)).thenReturn(getSingleNodeAsSet(node2));
-        Mockito.when(cfg.successors(node3)).thenReturn(getSingleNodeAsSet(exit));
+        Mockito.when(cfg.successors(node3)).thenReturn(getSingleNodeAsSet(node4));
+
+        //Node4
+        Mockito.when(cfg.predecessors(node4)).thenReturn(getSingleNodeAsSet(node3));
+        Set<Node> nodes = new HashSet<>();
+        nodes.add(node5);
+        nodes.add(exit);
+        Mockito.when(cfg.successors(node4)).thenReturn(nodes);
+
+
+        //Node5
+        Mockito.when(cfg.predecessors(node5)).thenReturn(getSingleNodeAsSet(node4));
+        nodes = new HashSet<>();
+        nodes.add(node6);
+        nodes.add(node10);
+        Mockito.when(cfg.successors(node5)).thenReturn(nodes);
+
 
         //Exit Node
         Mockito.when(cfg.exitNode()).thenReturn(exit);
@@ -172,88 +201,5 @@ public class LiveVariableTests {
         return nodes;
     }
 
-
-
-
-    /**
-     * Generates nodes for the following simple program
-     * //entry
-     * b = 3         //node1
-     * c = 5         //node2
-     * a = f(b * c)  //node3
-     * //exit
-     */
-    private List<Node> generateNodesForSimpleCFG() {
-        List<Node> nodes = new ArrayList<>();
-        Node node1 = new Node() {
-            @Override
-            public Set<String> getDefs() {
-                String b = "b";
-                Set<String> defs = new HashSet<>();
-                defs.add(b);
-                return defs;
-            }
-
-            @Override
-            public Set<String> getUses() {
-                return new HashSet<>();
-            }
-
-            @Override
-            public String toString() {
-                return "node1";
-            }
-        };
-
-        Node node2 = new Node() {
-            @Override
-            public Set<String> getDefs() {
-                String c = "c";
-                Set<String> defs = new HashSet<>();
-                defs.add(c);
-                return defs;
-            }
-
-            @Override
-            public Set<String> getUses() {
-                return new HashSet<>();
-            }
-
-            @Override
-            public String toString() {
-                return "node2";
-            }
-        };
-
-        Node node3 = new Node() {
-            @Override
-            public Set<String> getDefs() {
-                String a = "a";
-                Set<String> defs = new HashSet<>();
-                defs.add(a);
-                return defs;
-            }
-
-            @Override
-            public Set<String> getUses() {
-                Set<String> uses = new HashSet<>();
-                uses.add("b");
-                uses.add("c");
-                return uses;
-            }
-
-            @Override
-            public String toString() {
-                return "node3";
-            }
-        };
-
-        nodes.add(node1);
-        nodes.add(node2);
-        nodes.add(node3);
-
-        return nodes;
-
-    }
 
 }
