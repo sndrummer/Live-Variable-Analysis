@@ -5,8 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
+
 import java.util.Map;
 import java.util.Set;
 
@@ -15,8 +14,10 @@ public class LiveVariableAnalyzer extends LiveVariableAnalysis {
     private static Logger logger = LoggerFactory.getLogger(LiveVariableAnalysis.class);
     private CFG cfg;
     private Set<String> liveVariables = new HashSet<>();
+    private Map<Node, Set<String>> nodeToLiveOnEntryVariables = new HashMap<>();
 
-    //private Map<Node, Boolean> nodeTraversedMap = new HashMap<>();
+    private Map<Node, Integer> nodeToSuccessorsCovered = new HashMap<>();
+
     private Set<Node> nodesVisited = new HashSet<>();
 
     //private Map<Node, Set<String>> nodeToEntrySet;
@@ -28,88 +29,47 @@ public class LiveVariableAnalyzer extends LiveVariableAnalysis {
 
     @Override
     public Map<Node, Set<String>> analyze() {
-        Map<Node, Set<String>> nodeToLiveOnEntryVariables = new HashMap<>();
+
         //Start from the end of the CFG
         Node exitNode = cfg.exitNode();
-        nodeToLiveOnEntryVariables.put(exitNode, new HashSet<String>());
-
-        traverseCFGLiveNodes(exitNode);
+        traverseCFGLiveNodes(exitNode, new HashSet<>());
 
         return nodeToLiveOnEntryVariables;
     }
 
-//
-//    private void traverseCFGLiveNodesAlt(Node node, int predecessorsVisited) {
-//        Node currentNode = node;
-//
-//        while (currentNode != null) {
-//            Set<Node> predecessors = getPredecessors(currentNode);
-//            if (predecessors == null || predecessors.isEmpty()) {
-//                return;
-//            }
-//            for (Node predecessor : predecessors) {
-//                addDefinitions(predecessor.getDefs());
-//                addUses(predecessor.getUses());
-//            }
-//
-//            if (!allPredecessorsVisited(currentNode, predecessorsVisited)) {
-//                return;
-//            }
-//
-//            for (Node predecessor : predecessors) {
-//                predecessorsVisited++;
-//                traverseCFGLiveNodesAlt(predecessor, predecessorsVisited);
-//            }
-//
-//            currentNode =
-//        }
-//
-//
-//
-//
-//
-//
-//        while (currentNode != null) {
-//            for (Node predecessor : predecessors) {
-//                addDefinitions(predecessor.getDefs());
-//                addUses(predecessor.getUses());
-//            }
-//
-//            if (predecessors.size() == 1) {
-//                Iterator iter = predecessors.iterator();
-//                currentNode = (Node) iter.next();
-//            }
-//            else {
-//
-//            }
-//
-//            nodesVisited.add(currentNode);
-//            for (Node predecessor : cfg.predecessors(currentNode)) {
-//                if (!nodeVisited(currentNode)) {
-//                    currentNode = predecessor;
-//                }
-//            }
-//        }
-//    }
-
-    private void traverseCFGLiveNodes(Node node) {
-        Node currentNode = node;
-        Set<Node> predecessors = getPredecessors(currentNode);
-        while (currentNode != null) {
+    /**
+     * Recursively traverse the CFG backwards to gather information on the live variables
+     *
+     * @param node
+     */
+    private void traverseCFGLiveNodes(Node node, Set<String> liveVariables) {
+        Set<Node> predecessors = getPredecessors(node);
+        //logger.debug("Traversing");
+        if (node != null) {
             for (Node predecessor : predecessors) {
-                addDefinitions(predecessor.getDefs());
-                addUses(predecessor.getUses());
+                addDefinitions(predecessor.getDefs(), liveVariables);
+                addUses(predecessor, predecessor.getUses(), liveVariables);
             }
 
-            if (predecessors.size() == 1) {
-                Iterator iter = predecessors.iterator();
-                currentNode = (Node) iter.next();
-            }
+            //Here's what you need to do
+            /*
+            1. You need to do what you are doing so far but then
+            2. Check if the prev node has multiple successors, if it does just increment a value
+            3. You could maybe make a Node to successor's covered map? that would be weird but it might work
+            So the key would be the node and the value would be how many successors have been covered,
+            Use node 4 from the HW as an example.
+            4. Make a condition that you ONLY traverse a node with multiple predecessors once you have seen them all!!
+            5. So make something like if successors equals amtSeen then prevNode = curNode, you actually
+            probably don't want recursive in this case because you want it to be iterative!!!! That is true huh
+            6. So make that condition
+             */
 
-            nodesVisited.add(currentNode);
+
+            nodesVisited.add(node);
             for (Node predecessor : predecessors) {
-                if (!nodeVisited(currentNode)) {
-                    currentNode = predecessor;
+                if (!nodeVisited(predecessor)) {
+                    node = predecessor;
+                    traverseCFGLiveNodes(node, liveVariables);
                 }
             }
         }
@@ -136,7 +96,7 @@ public class LiveVariableAnalyzer extends LiveVariableAnalysis {
      *
      * @param definitions
      */
-    private void addDefinitions(Set<String> definitions) {
+    private void addDefinitions(Set<String> definitions, Set<String> liveVariables) {
         for (String definition : definitions) {
             if (liveVariables.contains(definition)) {
                 logger.info("Live Variable: {}, killed", definition);
@@ -146,13 +106,18 @@ public class LiveVariableAnalyzer extends LiveVariableAnalysis {
     }
 
     /**
-     * Add the uses to the live variables, since they are used, they must be defined in predecessors
-     *
-     * @param uses String representations of the variables that are used
+     * @param uses
+     * @param liveVariables
      */
-    private void addUses(Set<String> uses) {
-        liveVariables.addAll(uses);
+    private void addUses(Node node, Set<String> uses, Set<String> liveVariables) {
+        Set<String> liveVariablesOfNode = new HashSet<>();
+        liveVariablesOfNode.addAll(liveVariables);
+        liveVariablesOfNode.addAll(uses);
+        liveVariables.addAll(liveVariablesOfNode);
+        nodeToLiveOnEntryVariables.put(node, liveVariablesOfNode);
+        logger.info("Node: {} --> {}", node, nodeToLiveOnEntryVariables.get(node));
     }
+
 
     private Set<Node> getPredecessors(Node node) {
         return cfg.predecessors(node);
