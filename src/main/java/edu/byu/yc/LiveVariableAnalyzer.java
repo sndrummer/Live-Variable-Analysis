@@ -3,9 +3,11 @@ package edu.byu.yc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -17,8 +19,9 @@ public class LiveVariableAnalyzer extends LiveVariableAnalysis {
     private Map<Node, Set<String>> nodeToLiveOnEntryVariables = new HashMap<>();
 
     private Map<Node, Integer> nodeToSuccessorsCovered = new HashMap<>();
-
     private Set<Node> nodesVisited = new HashSet<>();
+
+    private Map<Node, Integer> nodeExitVisits = new HashMap<>();
 
     //private Map<Node, Set<String>> nodeToEntrySet;
 
@@ -43,7 +46,9 @@ public class LiveVariableAnalyzer extends LiveVariableAnalysis {
      * @param node
      */
     private void traverseCFGLiveNodes(Node node, Set<String> liveVariables) {
+        logger.debug("NOW VISITING NODE {}", node);
         Set<Node> predecessors = getPredecessors(node);
+        boolean added = false;
         //logger.debug("Traversing");
         if (node != null) {
             for (Node predecessor : predecessors) {
@@ -55,19 +60,37 @@ public class LiveVariableAnalyzer extends LiveVariableAnalysis {
             for (Node predecessor : predecessors) {
                 if (!nodeVisited(predecessor)) {
                     node = predecessor;
-                    traverseCFGLiveNodes(node, liveVariables);
+                    Set<String> nextLiveVariables = new HashSet<>(nodeToLiveOnEntryVariables.get(node));
+                    if (canVisit(node)) {
+                        traverseCFGLiveNodes(node, nextLiveVariables);
+                    }
+
                 }
             }
         }
     }
 
-    private boolean allSuccessorsVisited(Node node, int successorsVisited) {
+    private boolean canVisit(Node node) {
+
+        boolean canVisit = false;
+        Integer visits = nodeToSuccessorsCovered.get(node);
+        if (visits == null) visits = 0;
+        visits++;
+        nodeToSuccessorsCovered.put(node, visits);
+
         int successors = cfg.successors(node).size();
-        if (successorsVisited > successors) {
+
+        if (visits > successors) {
             throw new RuntimeException("Visited more than there are successors");
         }
-        return successors == successorsVisited;
+
+        canVisit = visits == successors;
+        if (!canVisit) {
+            logger.debug("CANNOT VISIT {} only {} visits out of {}", node, visits, successors);
+        }
+        return visits == successors;
     }
+
 
     private boolean allPredecessorsVisited(Node node, int predecessorsVisited) {
         int predecessors = getPredecessors(node).size();
@@ -92,16 +115,17 @@ public class LiveVariableAnalyzer extends LiveVariableAnalysis {
     }
 
     /**
-     * @param uses
-     * @param liveVariables
+     * @return boolean whether or not uses have been added
      */
     private void addUses(Node node, Set<String> uses, Set<String> liveVariables) {
         Set<String> liveVariablesOfNode = new HashSet<>();
         liveVariablesOfNode.addAll(liveVariables);
         liveVariablesOfNode.addAll(uses);
-        liveVariables.addAll(liveVariablesOfNode);
+        if (nodeToLiveOnEntryVariables.get(node) != null) {
+            liveVariablesOfNode.addAll(nodeToLiveOnEntryVariables.get(node));
+        }
         nodeToLiveOnEntryVariables.put(node, liveVariablesOfNode);
-        logger.info("Node: {} --> {}", node, nodeToLiveOnEntryVariables.get(node));
+        logger.info("Putting Node: {} --> {}", node, nodeToLiveOnEntryVariables.get(node));
     }
 
 

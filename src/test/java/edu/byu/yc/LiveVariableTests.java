@@ -180,7 +180,7 @@ public class LiveVariableTests {
         Mockito.when(cfg.successors(node9)).thenReturn(getSingleNodeAsSet(exit));
 
         //Node10
-        Mockito.when(cfg.predecessors(node10)).thenReturn(getSingleNodeAsSet(node9));
+        Mockito.when(cfg.predecessors(node10)).thenReturn(getSingleNodeAsSet(node5));
         Mockito.when(cfg.successors(node10)).thenReturn(getSingleNodeAsSet(node11));
 
         //Node11
